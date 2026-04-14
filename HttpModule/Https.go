@@ -14,13 +14,8 @@ import (
 
 var AllTargets = IDstructs.ListTargets{}
 
-//var IdTarget IDstructs.Target
-
 func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+
 	var Target DTOstructs.DTOTarget
 	if err := json.NewDecoder(r.Body).Decode(&Target); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -30,6 +25,7 @@ func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
+		return
 	}
 	AllTargets.AddTarget(NewTarget)
 
@@ -37,9 +33,9 @@ func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
+		return
 	} else {
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Success"))
 		w.Write(responce)
 		pp.Println(string(responce))
 	}
@@ -47,25 +43,25 @@ func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteTargetsHand(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+
 	vars := mux.Vars(r)
 	idstr := vars["id"]
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
+		return
 	}
 
 	IdTarget, err := IDstructs.FindById(id, AllTargets)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	responce, err := json.MarshalIndent(IdTarget, "", "    ")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	} else {
 		w.WriteHeader(http.StatusOK)
 		w.Write(responce)
@@ -73,10 +69,7 @@ func DeleteTargetsHand(w http.ResponseWriter, r *http.Request) {
 }
 
 func DelTarget(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "DELETE" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+
 	vars := mux.Vars(r)
 	idstr := vars["id"]
 	id, err := strconv.Atoi(idstr)
@@ -88,6 +81,7 @@ func DelTarget(w http.ResponseWriter, r *http.Request) {
 
 	if err := IDstructs.DeleteById(id, &AllTargets); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	} else {
 		w.WriteHeader(http.StatusNoContent)
 	}
@@ -95,17 +89,13 @@ func DelTarget(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTargets(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 
 	b, err := json.MarshalIndent(AllTargets.Targets, "", "    ")
 	if err != nil {
-		panic(err)
+		return
 	}
 	if _, err := w.Write(b); err != nil {
-		panic(err)
+		return
 	}
 
 }
