@@ -19,6 +19,7 @@ func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
 	var Target DTOstructs.DTOTarget
 	if err := json.NewDecoder(r.Body).Decode(&Target); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	NewTarget, err := Target.ValidateOnCreate()
@@ -42,7 +43,7 @@ func PostTargetsHand(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DeleteTargetsHand(w http.ResponseWriter, r *http.Request) {
+func FindHandler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	idstr := vars["id"]
@@ -103,7 +104,7 @@ func GetTargets(w http.ResponseWriter, r *http.Request) {
 func StartServer() {
 	router := mux.NewRouter()
 	router.Path("/targets").Methods("POST").HandlerFunc(PostTargetsHand)
-	router.Path("/targets/{id}").Methods("GET").HandlerFunc(DeleteTargetsHand)
+	router.Path("/targets/{id}").Methods("GET").HandlerFunc(FindHandler)
 	router.Path("/targets").Methods("GET").HandlerFunc(GetTargets)
 	router.Path("/targets/{id}").Methods("DELETE").HandlerFunc(DelTarget)
 	fmt.Println("Starting server on port 8080")
