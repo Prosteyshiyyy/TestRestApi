@@ -4,6 +4,8 @@ import (
 	"RestApi/DataBase"
 	"context"
 	"fmt"
+
+	"github.com/k0kubun/pp"
 )
 
 func main() {
@@ -13,7 +15,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	if err := bd.CreateTarget(ctx, 2111, "Iphone12", "http://iphone12x", "lolz"); err != nil {
-	}
-	fmt.Println("Success")
+	_, pps := bd.GetRows(ctx)
+	pp.Println(pps)
 }
